@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fdfaf7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="나의 캘린더">
+  <title>나의 캘린더</title>
+  <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- 상단: 년·월 선택 -->
+    <header class="topbar">
+      <button class="month-btn" id="monthBtn" type="button" aria-haspopup="dialog">
+        <span id="monthLabel">2026년 10월</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="today-btn press" id="todayBtn" type="button">오늘</button>
+    </header>
+
+    <div class="weekdays" aria-hidden="true">
+      <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+    </div>
+
+    <!-- 메인 캘린더: 좌우 스크롤로 달 이동 -->
+    <main class="months" id="months" aria-label="달력"></main>
+  </div>
+
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- 일정 확인 창 (일정이 있는 날짜를 눌렀을 때) -->
+  <section class="sheet" id="detailSheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <header class="sheet-header">
+      <button class="icon-btn" type="button" data-close aria-label="뒤로가기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2 id="detailTitle">10월 2일 (금)</h2>
+      <button class="action-btn action-btn--soft press" id="detailAddBtn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        일정 추가
+      </button>
+    </header>
+    <div class="sheet-body">
+      <ul class="event-list" id="eventList"></ul>
+    </div>
+  </section>
+
+  <!-- 일정 입력 창 (빈 날짜를 누르거나 '일정 추가'를 눌렀을 때) -->
+  <section class="sheet sheet--form" id="formSheet" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+    <header class="sheet-header">
+      <button class="icon-btn" type="button" data-close aria-label="뒤로가기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2 id="formTitle">일정 추가</h2>
+      <button class="action-btn press" id="saveBtn" type="submit" form="eventForm">저장</button>
+    </header>
+    <div class="sheet-body" id="formBody">
+      <form class="form" id="eventForm" novalidate autocomplete="off">
+        <div class="field" data-field="title">
+          <label class="field-label" for="fTitle">제목 <span class="req">*</span></label>
+          <input class="input" id="fTitle" name="title" type="text" maxlength="50" placeholder="어떤 일정인가요?" enterkeyhint="done">
+          <p class="field-error" role="alert"></p>
+        </div>
+
+        <fieldset class="field" data-field="category">
+          <legend class="field-label">분류 <span class="req">*</span></legend>
+          <div class="chips" id="categoryChips"></div>
+          <p class="field-error" role="alert"></p>
+        </fieldset>
+
+        <div class="field" data-field="schedule">
+          <span class="field-label">일정 <span class="req">*</span></span>
+          <div class="dt-row">
+            <span>시작</span>
+            <input class="input" id="fStartDate" type="date" aria-label="시작 일자">
+            <input class="input" id="fStartTime" type="time" aria-label="시작 시간">
+          </div>
+          <div class="dt-row">
+            <span>종료</span>
+            <input class="input" id="fEndDate" type="date" aria-label="끝나는 일자">
+            <input class="input" id="fEndTime" type="time" aria-label="끝나는 시간">
+          </div>
+          <p class="field-error" role="alert"></p>
+        </div>
+
+        <div class="field" data-field="memo">
+          <label class="field-label" for="fMemo">메모 <span class="optional">(선택)</span></label>
+          <textarea class="input" id="fMemo" name="memo" rows="4" maxlength="500" placeholder="장소, 준비물 등 자유롭게 적어주세요"></textarea>
+        </div>
+
+        <button class="delete-btn press" id="deleteBtn" type="button" hidden>이 일정 삭제</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 년·월 선택 창 -->
+  <section class="sheet" id="pickerSheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+    <header class="sheet-header">
+      <button class="icon-btn" type="button" data-close aria-label="뒤로가기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <h2 id="pickerTitle">년·월 선택</h2>
+      <span></span>
+    </header>
+    <div class="sheet-body">
+      <div class="year-row">
+        <button class="icon-btn" id="prevYearBtn" type="button" aria-label="이전 해">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <strong id="pickerYear">2026년</strong>
+        <button class="icon-btn" id="nextYearBtn" type="button" aria-label="다음 해">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="month-pick" id="monthPick"></div>
+    </div>
+  </section>
+
+  <div class="saving" id="saving" hidden>
+    <div class="saving-box"><span class="spinner" aria-hidden="true"></span><span role="status">저장중..</span></div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
