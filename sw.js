@@ -2,9 +2,9 @@
    서비스 워커: 홈 화면 앱 설치 + 오프라인에서도 열리게
    - 우리 파일: 네트워크 먼저 → 실패하면(오프라인) 저장해둔 것 사용
      그래서 깃허브에 푸쉬하면 다음에 열 때 바로 새 버전이 보여요.
-   - 글꼴(CDN): 저장해둔 것 먼저 → 없으면 네트워크
+   - 글꼴(CDN·구글 폰트): 저장해둔 것 먼저 → 없으면 네트워크
    ========================================================= */
-const CACHE = 'my-calendar-v1';
+const CACHE = 'my-calendar-v2';
 
 const APP_SHELL = [
   './',
@@ -21,6 +21,7 @@ const APP_SHELL = [
   'icons/goal-done.png',
   'icons/holiday.png',
   'icons/work.png',
+  'icons/sunghoon.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -44,7 +45,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin === self.location.origin) {
     event.respondWith(networkFirst(request));
-  } else if (url.hostname === 'cdn.jsdelivr.net') {
+  } else if (['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'].includes(url.hostname)) {
     event.respondWith(cacheFirst(request));
   }
 });

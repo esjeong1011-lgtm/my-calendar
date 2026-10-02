@@ -12,6 +12,9 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -29,12 +32,14 @@
       </div>
     </header>
 
-    <div class="weekdays" aria-hidden="true">
-      <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
-    </div>
+    <div class="calendar-card">
+      <div class="weekdays" aria-hidden="true">
+        <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+      </div>
 
-    <!-- 메인 캘린더: 좌우 스크롤로 달 이동 -->
-    <main class="months" id="months" aria-label="달력"></main>
+      <!-- 메인 캘린더: 위아래 스크롤로 달 이동 -->
+      <main class="months" id="months" aria-label="달력"></main>
+    </div>
   </div>
 
   <div class="backdrop" id="backdrop"></div>

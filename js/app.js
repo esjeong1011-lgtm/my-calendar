@@ -8,9 +8,10 @@
    ========================================================= */
 const CATEGORIES = [
   { id: 'appointment', label: '약속',   icon: 'icons/appointment.png' },
-  { id: 'goal',        label: '목표',   icon: 'icons/goal.png', iconTodo: 'icons/goal-todo.png', iconDone: 'icons/goal-done.png' },
-  { id: 'holiday',     label: '공휴일', icon: 'icons/holiday.png' },
   { id: 'work',        label: '일',     icon: 'icons/work.png' },
+  { id: 'goal',        label: '목표',   icon: 'icons/goal.png', iconTodo: 'icons/goal-todo.png', iconDone: 'icons/goal-done.png' },
+  { id: 'sunghoon',    label: '성훈',   icon: 'icons/sunghoon.png' },
+  { id: 'holiday',     label: '공휴일', icon: 'icons/holiday.png' },
 ];
 const CAT = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 
@@ -147,10 +148,10 @@ const now = new Date();
 let anchor = monthIndex(now.getFullYear(), now.getMonth()); // 가운데 칸의 달
 let visibleMonth = anchor;
 
-// 이전·현재·다음 달 3칸을 그려두고, 넘길 때마다 가운데로 다시 맞춤
+// 이전·현재·다음 달 3칸을 위아래로 그려두고, 넘길 때마다 가운데로 다시 맞춤
 function renderMonths() {
   el.months.replaceChildren(buildMonth(anchor - 1), buildMonth(anchor), buildMonth(anchor + 1));
-  el.months.scrollLeft = el.months.clientWidth;
+  el.months.scrollTop = el.months.clientHeight;
   setVisibleMonth(anchor);
 }
 
@@ -228,9 +229,9 @@ function goToMonth(mi) {
 }
 
 function settleScroll() {
-  const w = el.months.clientWidth;
-  if (!w) return;
-  const idx = Math.round(el.months.scrollLeft / w);
+  const h = el.months.clientHeight;
+  if (!h) return;
+  const idx = Math.round(el.months.scrollTop / h);
   if (idx === 1) return;
   anchor += idx - 1;
   renderMonths();
@@ -238,8 +239,8 @@ function settleScroll() {
 
 let scrollTimer;
 el.months.addEventListener('scroll', () => {
-  const w = el.months.clientWidth;
-  if (w) setVisibleMonth(anchor + Math.round(el.months.scrollLeft / w) - 1);
+  const h = el.months.clientHeight;
+  if (h) setVisibleMonth(anchor + Math.round(el.months.scrollTop / h) - 1);
   if (!('onscrollend' in window)) {
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(settleScroll, 120);
@@ -250,16 +251,16 @@ el.months.addEventListener('scrollend', settleScroll);
 // PC에서 확인할 때: 마우스 휠로도 달 이동
 let wheelLock = false;
 el.months.addEventListener('wheel', (e) => {
-  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+  if (!e.deltaY) return;
   e.preventDefault();
   if (wheelLock) return;
   wheelLock = true;
-  el.months.scrollBy({ left: Math.sign(e.deltaY) * el.months.clientWidth, behavior: 'smooth' });
+  el.months.scrollBy({ top: Math.sign(e.deltaY) * el.months.clientHeight, behavior: 'smooth' });
   setTimeout(() => { wheelLock = false; }, 450);
 }, { passive: false });
 
 window.addEventListener('resize', () => {
-  el.months.scrollLeft = el.months.clientWidth;
+  el.months.scrollTop = el.months.clientHeight;
 });
 
 el.months.addEventListener('click', (e) => {
@@ -385,6 +386,9 @@ function buildEventItem(ev) {
   main.append(makeIcon(iconFor(ev), ev.category, 'event-icon'), text);
   li.append(main);
 
+  const actions = document.createElement('div');
+  actions.className = 'event-actions';
+
   if (ev.category === 'goal') {
     const toggle = document.createElement('button');
     toggle.type = 'button';
@@ -398,16 +402,25 @@ function buildEventItem(ev) {
     } else {
       toggle.textContent = '미완료';
     }
-    li.append(toggle);
+    actions.append(toggle);
   }
+
+  const edit = document.createElement('button');
+  edit.type = 'button';
+  edit.className = 'edit-btn press';
+  edit.dataset.id = ev.id;
+  edit.setAttribute('aria-label', `${ev.title} 수정`);
+  edit.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>수정';
+  actions.append(edit);
+  li.append(actions);
   return li;
 }
 
 el.eventList.addEventListener('click', (e) => {
   const toggle = e.target.closest('.goal-toggle');
   if (toggle) return toggleGoal(toggle.dataset.id);
-  const main = e.target.closest('.event-main');
-  if (main) openForm({ event: events.find((ev) => ev.id === main.dataset.id) });
+  const target = e.target.closest('.edit-btn, .event-main');
+  if (target) openForm({ event: events.find((ev) => ev.id === target.dataset.id) });
 });
 
 el.detailAddBtn.addEventListener('click', () => openForm({ date: selectedDate }));
