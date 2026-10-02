@@ -74,7 +74,14 @@
         </fieldset>
 
         <div class="field" data-field="schedule">
-          <span class="field-label">일정 <span class="req">*</span></span>
+          <div class="field-head">
+            <span class="field-label">일정 <span class="req">*</span></span>
+            <label class="allday">
+              <input id="fAllDay" type="checkbox" role="switch">
+              <span>하루 종일</span>
+              <span class="allday-track" aria-hidden="true"></span>
+            </label>
+          </div>
           <div class="dt-row">
             <span>시작</span>
             <input class="input" id="fStartDate" type="date" aria-label="시작 일자">

@@ -94,6 +94,8 @@ const el = {
   startTime: $('#fStartTime'),
   endDate: $('#fEndDate'),
   endTime: $('#fEndTime'),
+  allDay: $('#fAllDay'),
+  scheduleField: $('[data-field="schedule"]'),
   memo: $('#fMemo'),
   pickerSheet: $('#pickerSheet'),
   pickerYear: $('#pickerYear'),
@@ -111,18 +113,15 @@ function iconFor(ev) {
   return c.icon;
 }
 
-// 하루에 여러 분류가 있으면 CATEGORIES에서 위에 있는 분류의 아이콘
-function pickDayIcon(list) {
-  for (const c of CATEGORIES) {
-    const hits = list.filter((ev) => ev.category === c.id);
-    if (!hits.length) continue;
-    if (c.id === 'goal') {
-      const allDone = hits.every((ev) => ev.done);
-      return { src: allDone ? c.iconDone : c.iconTodo, catId: c.id };
-    }
-    return { src: c.icon, catId: c.id };
-  }
-  return null;
+const MAX_STACK = 3; // 한 칸에 겹쳐 보여줄 캐릭터 최대 수
+
+// 그날 일정마다 캐릭터 하나씩, 분류 우선순위(CATEGORIES 순서)대로 정렬
+// 첫 번째가 맨 앞(아래쪽), 나머지는 뒤에서 귀만 보이게 겹침
+function dayIcons(list) {
+  const order = (ev) => CATEGORIES.findIndex((c) => c.id === ev.category);
+  return [...list]
+    .sort((a, b) => order(a) - order(b) || a.start.localeCompare(b.start))
+    .map((ev) => ({ src: iconFor(ev), catId: ev.category }));
 }
 
 // 이미지가 아직 없거나 깨지면 분류 색 + 첫 글자로 대신 표시
@@ -184,9 +183,25 @@ function buildDay(d, inMonth, todayKey) {
   if (dow === 0) btn.classList.add('is-sun');
   if (dow === 6) btn.classList.add('is-sat');
 
-  const icon = pickDayIcon(list);
-  if (icon) {
-    btn.append(makeIcon(icon.src, icon.catId, 'day-icon'));
+  const icons = dayIcons(list);
+  if (icons.length) {
+    const shown = icons.slice(0, MAX_STACK);
+    const stack = document.createElement('span');
+    stack.className = 'day-stack';
+    stack.style.setProperty('--n', shown.length);
+    shown.forEach((icon, i) => {
+      const img = makeIcon(icon.src, icon.catId, 'day-icon');
+      img.style.setProperty('--i', i);
+      img.style.zIndex = shown.length - i;
+      stack.append(img);
+    });
+    btn.append(stack);
+    if (icons.length > MAX_STACK) {
+      const more = document.createElement('span');
+      more.className = 'day-more';
+      more.textContent = `+${icons.length - MAX_STACK}`;
+      btn.append(more);
+    }
   } else {
     const num = document.createElement('span');
     num.className = 'day-num';
@@ -325,6 +340,7 @@ function renderDetail() {
 function formatRange(ev) {
   const [sd, st] = ev.start.split('T');
   const [ed, et] = ev.end.split('T');
+  if (ev.allDay) return sd === ed ? '하루 종일' : `${shortDate(sd)} ~ ${shortDate(ed)} · 하루 종일`;
   if (sd === ed) return `${st} ~ ${et}`;
   return `${shortDate(sd)} ${st} ~ ${shortDate(ed)} ${et}`;
 }
@@ -405,6 +421,7 @@ async function toggleGoal(id) {
 /* ===== 일정 입력 창 ===== */
 let editingId = null;
 let prevStart = null;
+let timedBackup = null; // 하루 종일을 켜기 전 시간 (끄면 되돌림)
 
 function buildCategoryChips() {
   for (const c of CATEGORIES) {
@@ -451,6 +468,7 @@ function openForm({ date, event }) {
     el.form.elements.category.value = event.category;
     [el.startDate.value, el.startTime.value] = event.start.split('T');
     [el.endDate.value, el.endTime.value] = event.end.split('T');
+    el.allDay.checked = !!event.allDay;
     el.deleteBtn.hidden = false;
   } else {
     editingId = null;
@@ -461,6 +479,8 @@ function openForm({ date, event }) {
     el.deleteBtn.hidden = true;
   }
 
+  timedBackup = null;
+  el.scheduleField.classList.toggle('is-allday', el.allDay.checked);
   prevStart = readDT(el.startDate, el.startTime);
   el.formBody.scrollTop = 0;
   sheets.show(el.formSheet);
@@ -476,6 +496,22 @@ function onStartChange() {
   prevStart = start;
 }
 el.startDate.addEventListener('change', onStartChange);
+
+// 하루 종일: 시간 칸을 숨기고 00:00 ~ 23:59로 저장
+el.allDay.addEventListener('change', () => {
+  const on = el.allDay.checked;
+  el.scheduleField.classList.toggle('is-allday', on);
+  if (on) {
+    timedBackup = { start: el.startTime.value, end: el.endTime.value };
+    el.startTime.value = '00:00';
+    el.endTime.value = '23:59';
+  } else {
+    el.startTime.value = timedBackup?.start || '09:00';
+    el.endTime.value = timedBackup?.end || '10:00';
+    timedBackup = null;
+  }
+  prevStart = readDT(el.startDate, el.startTime);
+});
 el.startTime.addEventListener('change', onStartChange);
 
 // 받침에 맞는 조사 (을/를)
@@ -543,6 +579,7 @@ el.form.addEventListener('submit', async (e) => {
     start: `${el.startDate.value}T${el.startTime.value}`,
     end: `${el.endDate.value}T${el.endTime.value}`,
     memo: el.memo.value.trim(),
+    allDay: el.allDay.checked,
   };
 
   const next = editingId

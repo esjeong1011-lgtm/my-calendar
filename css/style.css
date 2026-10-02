@@ -186,14 +186,39 @@ svg { display: block; }
 .day.is-sat .day-num { color: var(--sat); }
 .day.is-today .day-num { font-weight: 900; }
 
-/* 일자 칸 크기에 맞춰 아이콘 크기 자동 조절 */
-.day-icon {
-  width: 28px;
-  height: 28px;
-  width: min(82cqw, 70cqh, 54px);
-  height: min(82cqw, 70cqh, 54px);
-  object-fit: contain;
+/* 일자 칸 크기에 맞춰 아이콘 크기 자동 조절
+   일정이 여러 개면 앞 캐릭터는 아래, 뒤 캐릭터는 위로 살짝씩 올려 귀만 보이게 겹침 */
+.day-stack {
+  --s: 28px;                      /* 캐릭터 크기 */
+  --peek: calc(var(--s) * .26);    /* 뒤 캐릭터가 위로 삐져나오는 정도 */
+  position: relative;
+  width: var(--s);
+  height: calc(var(--s) + var(--peek) * (var(--n) - 1));
   pointer-events: none;
+}
+@supports (width: 1cqw) {
+  .day-stack { --s: min(80cqw, 56cqh, 52px); }
+}
+.day-stack .day-icon {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--peek) * var(--i));
+  width: var(--s);
+  height: var(--s);
+  object-fit: contain;
+}
+.day-more {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  z-index: 5;
+  padding: 0 5px;
+  border: 1.5px solid var(--brown);
+  border-radius: 999px;
+  background-color: var(--card);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 15px;
 }
 .day.just-saved .day-icon { animation: pop .55s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes pop {
@@ -417,6 +442,49 @@ input::-webkit-date-and-time-value { text-align: left; }
   gap: 8px;
 }
 .dt-row + .dt-row { margin-top: 10px; }
+
+/* 하루 종일 스위치 */
+.field-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.field-head .field-label { margin: 0; }
+.allday {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  user-select: none;
+}
+.allday input { position: absolute; opacity: 0; pointer-events: none; }
+.allday-track {
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border: 2px solid var(--brown);
+  border-radius: 999px;
+  background-color: var(--card);
+  box-shadow: 2px 2px 0 var(--latte);
+  transition: background-color .2s;
+}
+.allday-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--brown);
+  border-radius: 50%;
+  background-color: var(--card);
+  transition: transform .2s var(--ease-sheet);
+}
+.allday input:checked ~ .allday-track { background-color: var(--chiikawa); }
+.allday input:checked ~ .allday-track::after { transform: translateX(18px); }
+.allday input:focus-visible ~ .allday-track { outline: 2px solid var(--hachiware); outline-offset: 2px; }
+
+/* 하루 종일이면 시간 칸 숨김 */
+.field.is-allday .dt-row { grid-template-columns: 36px 1fr; }
+.field.is-allday input[type="time"] { display: none; }
 .dt-row > span { font-size: 14px; font-weight: 800; }
 
 .chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 3px 3px 0; }
