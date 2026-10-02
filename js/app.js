@@ -714,6 +714,15 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch((err) => console.error('서비스 워커 등록 실패', err));
   });
+
+  // 새 버전이 설치되면 한 번 새로고침해서 바로 새 화면으로
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
 }
 
 /* ===== 시작 ===== */

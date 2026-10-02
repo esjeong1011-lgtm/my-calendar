@@ -1,10 +1,11 @@
 /* =========================================================
    서비스 워커: 홈 화면 앱 설치 + 오프라인에서도 열리게
    - 우리 파일: 네트워크 먼저 → 실패하면(오프라인) 저장해둔 것 사용
-     그래서 깃허브에 푸쉬하면 다음에 열 때 바로 새 버전이 보여요.
+     휴대폰 브라우저의 임시 저장(HTTP 캐시)을 건너뛰고 항상 서버에 확인해서
+     옛날 파일과 새 파일이 섞이지 않게 함
    - 글꼴(CDN·구글 폰트): 저장해둔 것 먼저 → 없으면 네트워크
    ========================================================= */
-const CACHE = 'my-calendar-v2';
+const CACHE = 'my-calendar-v3';
 
 const APP_SHELL = [
   './',
@@ -25,7 +26,9 @@ const APP_SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(APP_SHELL)));
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => cache.addAll(APP_SHELL.map((url) => new Request(url, { cache: 'reload' }))))
+  );
   self.skipWaiting();
 });
 
@@ -53,7 +56,10 @@ self.addEventListener('fetch', (event) => {
 async function networkFirst(request) {
   const cache = await caches.open(CACHE);
   try {
-    const response = await fetch(request);
+    const fresh = request.mode === 'navigate'
+      ? new Request(request.url, { cache: 'no-cache', credentials: 'same-origin' })
+      : new Request(request, { cache: 'no-cache' });
+    const response = await fetch(fresh);
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch {
