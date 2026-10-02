@@ -7,8 +7,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="나의 캘린더">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>나의 캘린더</title>
-  <link rel="icon" href="icons/app-icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -20,7 +23,10 @@
         <span id="monthLabel">2026년 10월</span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button class="today-btn press" id="todayBtn" type="button">오늘</button>
+      <div class="topbar-actions">
+        <button class="install-btn press" id="installBtn" type="button" hidden>앱 설치</button>
+        <button class="today-btn press" id="todayBtn" type="button">오늘</button>
+      </div>
     </header>
 
     <div class="weekdays" aria-hidden="true">

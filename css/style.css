@@ -112,6 +112,15 @@ svg { display: block; }
 .month-btn svg { width: 20px; height: 20px; color: var(--brown-soft); }
 .month-btn:active { background: var(--press); }
 
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.install-btn {
+  padding: 7px 12px;
+  border-radius: 14px;
+  background-color: var(--chiikawa-bg);
+  color: #c2185b;
+  font-size: 14px;
+  font-weight: 800;
+}
 .today-btn {
   padding: 7px 14px;
   border-radius: 14px;

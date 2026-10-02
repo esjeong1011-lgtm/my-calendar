@@ -77,6 +77,7 @@ const el = {
   monthBtn: $('#monthBtn'),
   monthLabel: $('#monthLabel'),
   todayBtn: $('#todayBtn'),
+  installBtn: $('#installBtn'),
   backdrop: $('#backdrop'),
   detailSheet: $('#detailSheet'),
   detailTitle: $('#detailTitle'),
@@ -670,6 +671,36 @@ function toast(message) {
   el.toast.classList.add('is-show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.toast.classList.remove('is-show'), 2000);
+}
+
+/* ===== 홈 화면 앱 설치 ===== */
+// 안드로이드 크롬: 설치할 수 있을 때만 '앱 설치' 버튼이 나타남
+// 아이폰 사파리: 공유 → '홈 화면에 추가'로 설치 (버튼 없음)
+let installPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  installPrompt = e;
+  el.installBtn.hidden = false;
+});
+
+el.installBtn.addEventListener('click', async () => {
+  if (!installPrompt) return;
+  installPrompt.prompt();
+  await installPrompt.userChoice;
+  installPrompt = null;
+  el.installBtn.hidden = true;
+});
+
+window.addEventListener('appinstalled', () => {
+  el.installBtn.hidden = true;
+  toast('홈 화면에 캘린더를 설치했어요.');
+});
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((err) => console.error('서비스 워커 등록 실패', err));
+  });
 }
 
 /* ===== 시작 ===== */
