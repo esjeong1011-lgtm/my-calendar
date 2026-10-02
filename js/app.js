@@ -3,13 +3,14 @@
 /* =========================================================
    설정
    - 분류 순서 = 달력 아이콘 우선순위 (위에 있을수록 먼저 표시)
-   - 아이콘을 바꾸려면 icons 폴더에 이미지를 넣고 경로만 바꿔주세요.
+   - icon: 분류 선택 버튼에 쓰는 대표 아이콘
+   - 목표는 달력·목록에서 완료 여부에 따라 iconTodo / iconDone 사용
    ========================================================= */
 const CATEGORIES = [
-  { id: 'appointment', label: '약속',   icon: 'icons/appointment.svg' },
-  { id: 'goal',        label: '목표',   icon: 'icons/goal-todo.svg', iconDone: 'icons/goal-done.svg' },
-  { id: 'holiday',     label: '공휴일', icon: 'icons/holiday.svg' },
-  { id: 'work',        label: '일',     icon: 'icons/work.svg' },
+  { id: 'appointment', label: '약속',   icon: 'icons/appointment.png' },
+  { id: 'goal',        label: '목표',   icon: 'icons/goal.png', iconTodo: 'icons/goal-todo.png', iconDone: 'icons/goal-done.png' },
+  { id: 'holiday',     label: '공휴일', icon: 'icons/holiday.png' },
+  { id: 'work',        label: '일',     icon: 'icons/work.png' },
 ];
 const CAT = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 
@@ -106,7 +107,8 @@ const el = {
 /* ===== 아이콘 ===== */
 function iconFor(ev) {
   const c = CAT[ev.category];
-  return ev.category === 'goal' && ev.done ? c.iconDone : c.icon;
+  if (ev.category === 'goal') return ev.done ? c.iconDone : c.iconTodo;
+  return c.icon;
 }
 
 // 하루에 여러 분류가 있으면 CATEGORIES에서 위에 있는 분류의 아이콘
@@ -114,8 +116,11 @@ function pickDayIcon(list) {
   for (const c of CATEGORIES) {
     const hits = list.filter((ev) => ev.category === c.id);
     if (!hits.length) continue;
-    const allDone = c.id === 'goal' && hits.every((ev) => ev.done);
-    return { src: allDone ? c.iconDone : c.icon, catId: c.id };
+    if (c.id === 'goal') {
+      const allDone = hits.every((ev) => ev.done);
+      return { src: allDone ? c.iconDone : c.iconTodo, catId: c.id };
+    }
+    return { src: c.icon, catId: c.id };
   }
   return null;
 }

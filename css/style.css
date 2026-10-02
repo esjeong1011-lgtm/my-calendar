@@ -190,8 +190,8 @@ svg { display: block; }
 .day-icon {
   width: 28px;
   height: 28px;
-  width: min(68cqw, 60cqh, 46px);
-  height: min(68cqw, 60cqh, 46px);
+  width: min(82cqw, 70cqh, 54px);
+  height: min(82cqw, 70cqh, 54px);
   object-fit: contain;
   pointer-events: none;
 }
@@ -326,7 +326,7 @@ svg { display: block; }
   text-align: left;
 }
 .event-main:active { background: var(--press); }
-.event-icon { flex: none; width: 42px; height: 42px; object-fit: contain; }
+.event-icon { flex: none; width: 48px; height: 48px; object-fit: contain; }
 .event-text { flex: 1; min-width: 0; }
 .event-title { margin: 0 0 6px; font-size: 16px; font-weight: 900; word-break: break-word; }
 .event.is-done .event-title { text-decoration: line-through; color: var(--muted); }
@@ -437,7 +437,7 @@ input::-webkit-date-and-time-value { text-align: left; }
   transition: transform .1s, box-shadow .1s, border-color .15s, background-color .15s;
 }
 .chip-face:active { transform: scale(.95); }
-.chip-face img, .chip-face .icon-fallback { width: 30px; height: 30px; }
+.chip-face img, .chip-face .icon-fallback { width: 38px; height: 38px; }
 .chip input:checked + .chip-face {
   border-color: var(--brown);
   background-color: color-mix(in srgb, var(--cat) 16%, #fff);
