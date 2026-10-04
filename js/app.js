@@ -733,7 +733,7 @@ const ARRIVE = 1.4; // 캐릭터들이 도착하는 시점(초)부터 효과 시
 const FX_THEMES = {
   // 꽃 폭죽: 캐릭터들 뒤에서 꽃이 팡! 팡! 두 번 터져 퍼짐
   flowers: () => Array.from({ length: 22 }, (_, i) => fx('flower', 'burst', {
-    x: `${rand(30, 70)}%`, y: '86%',
+    x: `${rand(30, 70)}%`, y: '60%',
     dx: `${rand(-150, 150)}px`, dy: `${rand(-220, -100)}px`, r: `${rand(-360, 360)}deg`,
     s: rand(0.7, 1.15), dur: `${rand(1.8, 2.3)}s`,
     delay: `${ARRIVE + (i < 12 ? 0 : 1.2) + rand(0, 0.3)}s`,

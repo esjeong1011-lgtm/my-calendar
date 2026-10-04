@@ -148,10 +148,15 @@
        (말하는 캐릭터·멘트·주변 효과는 매번 랜덤, js/app.js의 CHEER_LINES / FX_THEMES) -->
   <section class="cheer" id="cheer" role="dialog" aria-modal="true" aria-label="응원 메시지">
     <div class="cheer-card">
-      <button class="cheer-close press" type="button" data-close aria-label="닫기">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
-      </button>
       <div class="cheer-fx" id="cheerFx" aria-hidden="true"></div>
+      <div class="cheer-top">
+        <button class="cheer-close" type="button" data-close aria-label="닫기">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
       <div class="cheer-talk">
         <p class="cheer-bubble" id="cheerText" aria-live="polite"></p>
         <svg class="cheer-tail" viewBox="0 0 26 22" aria-hidden="true">
@@ -163,6 +168,12 @@
         <img class="cheer-char cheer-char--hachiware" data-char="hachiware" src="icons/mascot/hachiware.png" alt="">
         <img class="cheer-char cheer-char--chiikawa" data-char="chiikawa" src="icons/mascot/chiikawa.png" alt="">
         <img class="cheer-char cheer-char--usagi" data-char="usagi" src="icons/mascot/usagi.png" alt="">
+        <!-- 잔디 언덕: 잘린 치마 아래를 가리고 그 위에 서 있는 것처럼 -->
+        <svg class="cheer-grass" viewBox="0 0 460 60" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M4 24 Q7.0 16.9 9.4 8.2 Q13.0 16.9 16.0 24 Q18.8 15.8 21.7 5.7 Q24.2 15.8 27.0 24 Q30.0 16.7 35.5 7.7 Q36.0 16.7 39.0 24 Q41.8 14.9 44.1 3.9 Q47.2 14.9 50.0 24 Q52.8 18.6 55.8 12.0 Q58.2 18.6 61.0 24 Q63.8 14.9 64.2 3.7 Q69.2 14.9 72.0 24 Q74.8 16.1 78.0 6.5 Q80.2 16.1 83.0 24 Q85.8 14.4 87.9 2.7 Q91.2 14.4 94.0 24 Q96.8 18.1 101.7 10.8 Q102.2 18.1 105.0 24 Q108.0 16.0 111.2 6.3 Q114.0 16.0 117.0 24 Q120.2 18.0 125.4 10.8 Q126.8 18.0 130.0 24 Q132.8 15.7 135.9 5.6 Q138.2 15.7 141.0 24 Q143.8 17.0 146.8 8.5 Q149.2 17.0 152.0 24 Q154.8 14.0 158.2 1.7 Q160.2 14.0 163.0 24 Q166.0 17.8 168.6 10.3 Q172.0 17.8 175.0 24 Q178.0 15.5 183.5 5.1 Q184.0 15.5 187.0 24 Q190.0 16.7 194.8 7.8 Q196.0 16.7 199.0 24 Q202.2 14.0 203.0 1.9 Q208.8 14.0 212.0 24 Q215.0 17.2 220.3 8.9 Q221.0 17.2 224.0 24 Q227.2 16.0 231.2 6.2 Q233.8 16.0 237.0 24 Q239.8 18.4 242.0 11.5 Q245.2 18.4 248.0 24 Q251.0 15.6 253.9 5.4 Q257.0 15.6 260.0 24 Q262.8 16.0 263.0 6.2 Q268.2 16.0 271.0 24 Q274.2 14.0 279.8 1.7 Q280.8 14.0 284.0 24 Q287.0 18.4 289.1 11.6 Q293.0 18.4 296.0 24 Q299.0 15.3 301.7 4.7 Q305.0 15.3 308.0 24 Q310.8 15.5 313.3 5.2 Q316.2 15.5 319.0 24 Q322.2 15.3 326.9 4.7 Q328.8 15.3 332.0 24 Q335.0 17.0 341.0 8.4 Q341.0 17.0 344.0 24 Q347.0 16.3 349.3 6.9 Q353.0 16.3 356.0 24 Q359.2 18.0 365.1 10.6 Q365.8 18.0 369.0 24 Q372.0 15.6 372.7 5.3 Q378.0 15.6 381.0 24 Q383.8 17.3 385.2 9.1 Q389.2 17.3 392.0 24 Q395.2 14.6 397.8 3.0 Q401.8 14.6 405.0 24 Q408.0 18.9 410.7 12.7 Q414.0 18.9 417.0 24 Q420.2 15.8 421.3 5.9 Q426.8 15.8 430.0 24 Q433.0 15.7 434.7 5.5 Q439.0 15.7 442.0 24 Q445.0 13.7 449.1 1.1 Q451.0 13.7 454.0 24 L456 24 C462 44 400 58 230.0 58 C60 58 -2 44 4 24 Z" fill="#9fd67a" stroke="#3b2a26" stroke-width="2.6" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          <g fill="none" stroke="#6fae4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M110 44l3-6l3 6" /><path d="M196 50l3-6l3 6" /><path d="M280 42l3-6l3 6" /><path d="M360 50l3-6l3 6" /><path d="M30 42l3-6l3 6" /></g>
+          <g fill="#fff" stroke="#3b2a26" stroke-width="1.4"><circle cx="70" cy="34" r="3.4"/><circle cx="73.8" cy="36.8" r="3.4"/><circle cx="72.4" cy="41.3" r="3.4"/><circle cx="67.6" cy="41.3" r="3.4"/><circle cx="66.2" cy="36.8" r="3.4"/></g><circle cx="70" cy="38" r="2.2" fill="#ffd76a" stroke="#3b2a26" stroke-width="1.2"/><g fill="#ffb3c6" stroke="#3b2a26" stroke-width="1.4"><circle cx="150" cy="42" r="3.4"/><circle cx="153.8" cy="44.8" r="3.4"/><circle cx="152.4" cy="49.3" r="3.4"/><circle cx="147.6" cy="49.3" r="3.4"/><circle cx="146.2" cy="44.8" r="3.4"/></g><circle cx="150" cy="46" r="2.2" fill="#ffd76a" stroke="#3b2a26" stroke-width="1.2"/><g fill="#fff" stroke="#3b2a26" stroke-width="1.4"><circle cx="238" cy="32" r="3.4"/><circle cx="241.8" cy="34.8" r="3.4"/><circle cx="240.4" cy="39.3" r="3.4"/><circle cx="235.6" cy="39.3" r="3.4"/><circle cx="234.2" cy="34.8" r="3.4"/></g><circle cx="238" cy="36" r="2.2" fill="#ffd76a" stroke="#3b2a26" stroke-width="1.2"/><g fill="#ffb3c6" stroke="#3b2a26" stroke-width="1.4"><circle cx="318" cy="43" r="3.4"/><circle cx="321.8" cy="45.8" r="3.4"/><circle cx="320.4" cy="50.3" r="3.4"/><circle cx="315.6" cy="50.3" r="3.4"/><circle cx="314.2" cy="45.8" r="3.4"/></g><circle cx="318" cy="47" r="2.2" fill="#ffd76a" stroke="#3b2a26" stroke-width="1.2"/><g fill="#fff" stroke="#3b2a26" stroke-width="1.4"><circle cx="398" cy="33" r="3.4"/><circle cx="401.8" cy="35.8" r="3.4"/><circle cx="400.4" cy="40.3" r="3.4"/><circle cx="395.6" cy="40.3" r="3.4"/><circle cx="394.2" cy="35.8" r="3.4"/></g><circle cx="398" cy="37" r="2.2" fill="#ffd76a" stroke="#3b2a26" stroke-width="1.2"/>
+        </svg>
         <svg class="cheer-pop" viewBox="0 0 30 30" aria-hidden="true">
           <path d="M6 14L2 10M11 9L10 3M17 10L20 4" fill="none" stroke="#3b2a26" stroke-width="2.4" stroke-linecap="round"/>
         </svg>
