@@ -107,6 +107,8 @@ const el = {
   saving: $('#saving'),
   toast: $('#toast'),
   cheer: $('#cheer'),
+  cheerText: $('#cheerText'),
+  cheerFx: $('#cheerFx'),
 };
 
 /* ===== 아이콘 ===== */
@@ -618,7 +620,7 @@ el.form.addEventListener('submit', async (e) => {
   toast(editingId ? '일정을 수정했어요.' : '일정을 저장했어요.');
 
   // 목표를 새로 등록하면 입력 창이 다 내려간 뒤 귀요미들이 응원하러 등장
-  if (isNewGoal) setTimeout(() => sheets.show(el.cheer), 650);
+  if (isNewGoal) setTimeout(showCheer, 650);
 });
 
 el.deleteBtn.addEventListener('click', async () => {
@@ -681,6 +683,106 @@ el.monthPick.addEventListener('click', (e) => {
   goToMonth(monthIndex(pickerYear, Number(b.dataset.month)));
   sheets.hide();
 });
+
+/* ===== 응원 팝업 (귀요미들) =====
+   한 번에 한 캐릭터만 말하고, 멘트와 주변 효과는 매번 랜덤 */
+const CHEER_LINES = {
+  hachiware: [
+    '왠지 오늘 하루도 엄청 좋은 일이 생길 것 같은 기분이 들어!',
+    '어려운 일은 내가 반으로 쪼개줄게! 자, 힘내자!',
+    '괜찮아, 괜찮아! 실패해도 다 추억이 되는 걸!',
+    '너랑 같이 있으면 뭐든지 해낼 수 있을 것 같아!',
+  ],
+  usagi: [
+    '야하-! 고민은 바구니에 담아서 던져버려!',
+    '후루룩 챱챱! 맛있는 거 먹고 그냥 잊어버리는 거야-!',
+    '우라자-! 일단 부딪혀 보는 거야, 쿠루쿠루~!',
+    '휴식 시간 끝! 다시 신나게 구르는 거야-!',
+  ],
+};
+
+const pick = (list) => list[Math.floor(Math.random() * list.length)];
+const rand = (min, max) => min + Math.random() * (max - min);
+const shuffle = (list) => [...list].sort(() => Math.random() - 0.5);
+
+// 같은 멘트·같은 효과가 연달아 나오지 않게
+function pickFresh(list, last) {
+  if (list.length < 2) return list[0];
+  let item;
+  do item = pick(list); while (item === last);
+  return item;
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function fx(symbol, kind, vars, color) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', `fx fx--${kind}`);
+  const use = document.createElementNS(SVG_NS, 'use');
+  use.setAttribute('href', `#fx-${symbol}`);
+  svg.append(use);
+  for (const [key, value] of Object.entries(vars)) svg.style.setProperty(`--${key}`, value);
+  if (color) svg.style.color = color;
+  return svg;
+}
+
+const PETALS = ['#ffb3c6', '#ffe08a', '#a8d8ff', '#ffffff', '#d6c4ff'];
+const CONFETTI = ['#ff8fa3', '#ffd76a', '#8fd0ff', '#b9e08f', '#d6c4ff'];
+const FOODS = ['onigiri', 'dango', 'pudding', 'strawberry', 'donut'];
+const ARRIVE = 1.4; // 캐릭터들이 도착하는 시점(초)부터 효과 시작
+
+const FX_THEMES = {
+  // 꽃 폭죽: 캐릭터들 뒤에서 꽃이 팡! 팡! 두 번 터져 퍼짐
+  flowers: () => Array.from({ length: 22 }, (_, i) => fx('flower', 'burst', {
+    x: `${rand(30, 70)}%`, y: '86%',
+    dx: `${rand(-150, 150)}px`, dy: `${rand(-220, -100)}px`, r: `${rand(-360, 360)}deg`,
+    s: rand(0.7, 1.15), dur: `${rand(1.8, 2.3)}s`,
+    delay: `${ARRIVE + (i < 12 ? 0 : 1.2) + rand(0, 0.3)}s`,
+  }, pick(PETALS))),
+
+  // 먹을거 비: 먼작귀 음식들이 살랑살랑 떨어짐
+  food: () => shuffle([...FOODS, pick(FOODS)]).map((food, i) => fx(food, 'fall', {
+    x: `${8 + i * 14 + rand(-4, 4)}%`, r: `${rand(10, 25)}deg`,
+    s: rand(0.85, 1.15), dur: `${rand(3.4, 4.6)}s`, delay: `${ARRIVE + rand(0, 2.4)}s`,
+  })),
+
+  // 파티 폭죽: 양쪽 아래 구석에서 색종이와 꽃이 발사
+  party: () => [-1, 1, -1, 1].flatMap((side, wave) => Array.from({ length: 8 }, (_, i) => fx(i % 3 ? 'confetti' : 'flower', 'burst', {
+    x: side < 0 ? '4%' : '96%', y: '96%',
+    dx: `${-side * rand(50, 210)}px`, dy: `${rand(-270, -130)}px`, r: `${rand(-540, 540)}deg`,
+    s: i % 3 ? rand(0.45, 0.7) : rand(0.6, 0.85), dur: `${rand(1.5, 2)}s`,
+    delay: `${ARRIVE + wave * 0.6 + rand(0, 0.15)}s`,
+  }, pick(i % 3 ? CONFETTI : PETALS)))),
+
+  // 하트: 캐릭터들 위로 하트와 반짝이가 둥실둥실
+  hearts: () => Array.from({ length: 8 }, (_, i) => fx(i % 3 === 2 ? 'sparkle' : 'heart', 'float', {
+    x: `${rand(6, 92)}%`, s: rand(0.6, 1), sway: `${rand(-16, 16)}px`,
+    dur: `${rand(2.8, 3.8)}s`, delay: `${ARRIVE + i * 0.35}s`,
+  }, i % 3 === 2 ? '#ffd76a' : pick(['#ff8fa3', '#ffb3c6', '#ff7d8f']))),
+
+  // 음표: 훌라 음악처럼 음표가 흔들흔들 올라감
+  notes: () => Array.from({ length: 7 }, (_, i) => fx('note', 'float', {
+    x: `${rand(6, 92)}%`, s: rand(0.65, 0.95), sway: `${rand(-20, 20)}px`,
+    dur: `${rand(2.6, 3.4)}s`, delay: `${ARRIVE + i * 0.4}s`,
+  }, pick(['#ff8fa3', '#8fd0ff', '#ffd76a', '#b9e08f']))),
+};
+
+let lastLine = null;
+let lastTheme = null;
+
+function showCheer() {
+  const speaker = pick(Object.keys(CHEER_LINES));
+  lastLine = pickFresh(CHEER_LINES[speaker], lastLine);
+  el.cheer.dataset.speaker = speaker;
+  el.cheerText.textContent = lastLine;
+  el.cheer.querySelectorAll('.cheer-char').forEach((img) => {
+    img.classList.toggle('is-speaking', img.dataset.char === speaker);
+  });
+
+  lastTheme = pickFresh(Object.keys(FX_THEMES), lastTheme);
+  el.cheerFx.replaceChildren(...FX_THEMES[lastTheme]());
+
+  sheets.show(el.cheer);
+}
 
 /* ===== 토스트 ===== */
 let toastTimer;

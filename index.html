@@ -144,23 +144,93 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- 응원 팝업: 목표 일정을 등록하면 귀요미들이 오른쪽에서 걸어 나옴 -->
+  <!-- 응원 팝업: 목표 일정을 등록하면 귀요미들이 오른쪽에서 걸어 나와 한 명이 응원
+       (말하는 캐릭터·멘트·주변 효과는 매번 랜덤, js/app.js의 CHEER_LINES / FX_THEMES) -->
   <section class="cheer" id="cheer" role="dialog" aria-modal="true" aria-label="응원 메시지">
     <div class="cheer-card">
       <button class="cheer-close press" type="button" data-close aria-label="닫기">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
       </button>
-      <span class="cheer-spark cheer-spark--1" aria-hidden="true">♡</span>
-      <span class="cheer-spark cheer-spark--2" aria-hidden="true">✦</span>
-      <span class="cheer-spark cheer-spark--3" aria-hidden="true">✦</span>
-      <p class="cheer-bubble" id="cheerText">할 수 있따!</p>
+      <div class="cheer-fx" id="cheerFx" aria-hidden="true"></div>
+      <div class="cheer-talk">
+        <p class="cheer-bubble" id="cheerText" aria-live="polite"></p>
+        <svg class="cheer-tail" viewBox="0 0 26 22" aria-hidden="true">
+          <path class="cheer-tail-fill" d="M2 0 Q11 9 7 21 Q16 11 24 0Z"/>
+          <path class="cheer-tail-line" d="M2 0 Q11 9 7 21 Q16 11 24 0"/>
+        </svg>
+      </div>
       <div class="cheer-stage" aria-hidden="true">
-        <img class="cheer-char cheer-char--hachiware" src="icons/mascot/hachiware.png" alt="">
-        <img class="cheer-char cheer-char--chiikawa" src="icons/mascot/chiikawa.png" alt="">
-        <img class="cheer-char cheer-char--usagi" src="icons/mascot/usagi.png" alt="">
+        <img class="cheer-char cheer-char--hachiware" data-char="hachiware" src="icons/mascot/hachiware.png" alt="">
+        <img class="cheer-char cheer-char--chiikawa" data-char="chiikawa" src="icons/mascot/chiikawa.png" alt="">
+        <img class="cheer-char cheer-char--usagi" data-char="usagi" src="icons/mascot/usagi.png" alt="">
+        <svg class="cheer-pop" viewBox="0 0 30 30" aria-hidden="true">
+          <path d="M6 14L2 10M11 9L10 3M17 10L20 4" fill="none" stroke="#3b2a26" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
       </div>
     </div>
   </section>
+
+  <!-- 응원 효과 그림 (먼작귀 그림체: 진한 갈색 선 + 파스텔 색) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="fx-flower" viewBox="-20 -20 40 40">
+        <g stroke="#3b2a26" stroke-width="4.4">
+          <circle cx="0" cy="-9" r="6.5"/><circle cx="8.6" cy="-2.8" r="6.5"/><circle cx="5.3" cy="7.3" r="6.5"/><circle cx="-5.3" cy="7.3" r="6.5"/><circle cx="-8.6" cy="-2.8" r="6.5"/>
+        </g>
+        <g fill="currentColor">
+          <circle cx="0" cy="-9" r="6.5"/><circle cx="8.6" cy="-2.8" r="6.5"/><circle cx="5.3" cy="7.3" r="6.5"/><circle cx="-5.3" cy="7.3" r="6.5"/><circle cx="-8.6" cy="-2.8" r="6.5"/>
+        </g>
+        <circle r="4.6" fill="#ffd76a" stroke="#3b2a26" stroke-width="2"/>
+      </symbol>
+      <symbol id="fx-onigiri" viewBox="0 0 40 40">
+        <path d="M20 5.5c3.6 0 15 18.5 15 24 0 4.6-4 5.5-15 5.5S5 34.1 5 29.5c0-5.5 11.4-24 15-24z" fill="#fff" stroke="#3b2a26" stroke-width="2.2" stroke-linejoin="round"/>
+        <rect x="13.5" y="24.5" width="13" height="10.5" rx="1.5" fill="#3f5444" stroke="#3b2a26" stroke-width="2"/>
+        <circle cx="16.3" cy="18" r="1.3" fill="#3b2a26"/><circle cx="23.7" cy="18" r="1.3" fill="#3b2a26"/>
+        <path d="M19 20.2q1 1 2 0" fill="none" stroke="#3b2a26" stroke-width="1.2" stroke-linecap="round"/>
+        <ellipse cx="13.4" cy="21" rx="2" ry="1.2" fill="#ffb3c1"/><ellipse cx="26.6" cy="21" rx="2" ry="1.2" fill="#ffb3c1"/>
+      </symbol>
+      <symbol id="fx-dango" viewBox="0 0 40 40">
+        <rect x="18.6" y="2" width="2.8" height="36" rx="1.4" fill="#e9c48f" stroke="#3b2a26" stroke-width="1.6"/>
+        <circle cx="20" cy="32" r="6.6" fill="#b9e08f" stroke="#3b2a26" stroke-width="2.2"/>
+        <circle cx="20" cy="21" r="6.6" fill="#fffaf0" stroke="#3b2a26" stroke-width="2.2"/>
+        <circle cx="20" cy="10" r="6.6" fill="#ffb3c6" stroke="#3b2a26" stroke-width="2.2"/>
+      </symbol>
+      <symbol id="fx-pudding" viewBox="0 0 40 40">
+        <ellipse cx="20" cy="34" rx="15.5" ry="3.8" fill="#fff" stroke="#3b2a26" stroke-width="2"/>
+        <path d="M11 33L13.6 14.5Q20 11.5 26.4 14.5L29 33Q20 35.5 11 33Z" fill="#ffe39a" stroke="#3b2a26" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M13.6 14.5Q20 11.5 26.4 14.5L25.8 19.2Q23.5 21.5 21.5 19.6Q19 22.5 16.8 19.6Q15 21 14 19.2Z" fill="#a8622e" stroke="#3b2a26" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M20 9.5q1.5-4 5-4.5" fill="none" stroke="#3b2a26" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="20" cy="10.5" r="2.7" fill="#ff6b81" stroke="#3b2a26" stroke-width="1.8"/>
+        <circle cx="17" cy="25.5" r="1.2" fill="#3b2a26"/><circle cx="23" cy="25.5" r="1.2" fill="#3b2a26"/>
+        <ellipse cx="14.8" cy="28" rx="1.8" ry="1.1" fill="#ffb3c1"/><ellipse cx="25.2" cy="28" rx="1.8" ry="1.1" fill="#ffb3c1"/>
+      </symbol>
+      <symbol id="fx-strawberry" viewBox="0 0 40 40">
+        <path d="M20 35C11 30 6 21 8.5 15C10.5 10.5 16 10.5 20 12.5C24 10.5 29.5 10.5 31.5 15C34 21 29 30 20 35Z" fill="#ff7d8f" stroke="#3b2a26" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M12 12.5L16 8.5L20 12L24 8.5L28 12.5L20 15.5Z" fill="#8fcf6b" stroke="#3b2a26" stroke-width="2" stroke-linejoin="round"/>
+        <g fill="#ffe8a3"><ellipse cx="15" cy="20" rx="1" ry="1.5"/><ellipse cx="21" cy="19.5" rx="1" ry="1.5"/><ellipse cx="26" cy="21" rx="1" ry="1.5"/><ellipse cx="17.5" cy="26" rx="1" ry="1.5"/><ellipse cx="23.5" cy="26.5" rx="1" ry="1.5"/></g>
+      </symbol>
+      <symbol id="fx-donut" viewBox="0 0 40 40">
+        <circle cx="20" cy="20" r="14.5" fill="#e8b77a" stroke="#3b2a26" stroke-width="2.2"/>
+        <path d="M8.5 18.5q1.5-9 11.5-9.5q10 .5 11.5 9.5q-1 3-2.5 1.5q-1.5 4-3.5 1.5q-2 3.5-4.5 1q-2.5 3.5-4.5 0q-2.5 3-4 -.5q-2 2-4-.5q-1.5 1.5-2.5-3z" fill="#ffb3c6" stroke="#3b2a26" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="20" cy="20" r="4.6" fill="#fff9f5" stroke="#3b2a26" stroke-width="2"/>
+        <g stroke-width="2" stroke-linecap="round"><path d="M13 14l2-1" stroke="#4ba3e3"/><path d="M25 12.5l1.5 1.5" stroke="#ffd76a"/><path d="M27.5 18l.5 2" stroke="#8fcf6b"/><path d="M16.5 10.5l1.5.5" stroke="#fff"/></g>
+      </symbol>
+      <symbol id="fx-heart" viewBox="0 0 40 40">
+        <path d="M20 34C9 26 4 19 6 13C8 7.5 15 6.5 20 12C25 6.5 32 7.5 34 13C36 19 31 26 20 34Z" fill="currentColor" stroke="#3b2a26" stroke-width="2.2" stroke-linejoin="round"/>
+        <ellipse cx="12.5" cy="14" rx="2.2" ry="1.4" fill="#fff" opacity=".8" transform="rotate(-35 12.5 14)"/>
+      </symbol>
+      <symbol id="fx-note" viewBox="0 0 40 40">
+        <path d="M20 29V7q8 1.5 10 8q-3-3-10-3" fill="currentColor" stroke="#3b2a26" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+        <ellipse cx="15" cy="30" rx="5.6" ry="4.4" transform="rotate(-20 15 30)" fill="currentColor" stroke="#3b2a26" stroke-width="2.2"/>
+      </symbol>
+      <symbol id="fx-sparkle" viewBox="0 0 40 40">
+        <path d="M20 4C21.5 14 26 18.5 36 20C26 21.5 21.5 26 20 36C18.5 26 14 21.5 4 20C14 18.5 18.5 14 20 4Z" fill="currentColor" stroke="#3b2a26" stroke-width="2" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="fx-confetti" viewBox="0 0 40 40">
+        <rect x="15" y="8" width="10" height="24" rx="3" fill="currentColor" stroke="#3b2a26" stroke-width="2"/>
+      </symbol>
+    </defs>
+  </svg>
 
   <script src="js/app.js"></script>
 </body>
