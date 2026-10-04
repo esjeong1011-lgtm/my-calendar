@@ -5,7 +5,7 @@
      옛날 파일과 새 파일이 섞이지 않게 함
    - 글꼴(CDN·구글 폰트): 저장해둔 것 먼저 → 없으면 네트워크
    ========================================================= */
-const CACHE = 'my-calendar-v3';
+const CACHE = 'my-calendar-v4';
 
 const APP_SHELL = [
   './',
@@ -23,6 +23,9 @@ const APP_SHELL = [
   'icons/holiday.png',
   'icons/work.png',
   'icons/sunghoon.png',
+  'icons/mascot/hachiware.png',
+  'icons/mascot/chiikawa.png',
+  'icons/mascot/usagi.png',
 ];
 
 self.addEventListener('install', (event) => {

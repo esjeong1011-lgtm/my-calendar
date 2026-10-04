@@ -698,6 +698,166 @@ input::-webkit-date-and-time-value { text-align: left; }
 }
 .toast.is-show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
+/* ===== 응원 팝업 (귀요미들) ===== */
+.cheer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s linear .25s;
+}
+.cheer.is-open { visibility: visible; pointer-events: auto; transition: visibility 0s; }
+
+.cheer-card {
+  position: relative;
+  width: min(340px, 100%);
+  padding-top: 26px;
+  background-color: var(--milk);
+  background-image:
+    radial-gradient(circle, rgba(255, 143, 163, .18) 2px, transparent 2.5px),
+    radial-gradient(circle, rgba(75, 163, 227, .14) 2px, transparent 2.5px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  border: var(--outline);
+  border-radius: 34px;
+  box-shadow: var(--puff);
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(.85) translateY(20px);
+  transition: opacity .2s, transform .25s ease-in;
+}
+.cheer.is-open .cheer-card {
+  opacity: 1;
+  transform: none;
+  transition: opacity .25s, transform .5s var(--spring);
+}
+
+.cheer-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background-color: var(--card);
+  color: var(--brown);
+}
+.cheer-close svg { width: 18px; height: 18px; }
+
+/* 말풍선: 셋이 도착하면 뿅 튀어나와서 둥실둥실 */
+.cheer-bubble {
+  position: relative;
+  width: fit-content;
+  margin: 8px auto 0;
+  padding: 10px 26px 8px;
+  background-color: var(--card);
+  border: var(--outline);
+  border-radius: 999px;
+  box-shadow: 0 3px 0 var(--latte);
+  font-family: var(--font-cute);
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--brown);
+  opacity: 0;
+  transform: scale(0);
+}
+.cheer-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  background-color: var(--card);
+  border-right: var(--outline);
+  border-bottom: var(--outline);
+  border-bottom-right-radius: 4px;
+  transform: rotate(45deg);
+}
+.cheer.is-open .cheer-bubble {
+  animation:
+    bubble-pop .55s var(--spring) 1.45s both,
+    bubble-float 2.4s ease-in-out 2s infinite;
+}
+@keyframes bubble-pop {
+  from { opacity: 0; transform: scale(0) rotate(-10deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes bubble-float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50%      { transform: translateY(-4px) rotate(-2deg); }
+}
+
+/* 반짝이 */
+.cheer-spark {
+  position: absolute;
+  z-index: 2;
+  font-size: 18px;
+  opacity: 0;
+}
+.cheer-spark--1 { top: 22px;  left: 26px;  color: var(--chiikawa); }
+.cheer-spark--2 { top: 58px;  left: 52px;  color: #f5b82e; font-size: 14px; }
+.cheer-spark--3 { top: 64px;  right: 58px; color: var(--hachiware); font-size: 15px; }
+.cheer.is-open .cheer-spark { animation: twinkle 1.6s ease-in-out 1.7s infinite; }
+.cheer.is-open .cheer-spark--2 { animation-delay: 2s; }
+.cheer.is-open .cheer-spark--3 { animation-delay: 2.3s; }
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(.4) rotate(0); }
+  50%      { opacity: 1; transform: scale(1.15) rotate(20deg); }
+}
+
+/* 무대: 세 캐릭터는 같은 크기 캔버스를 겹쳐 둬서 제자리에선 원래 그림처럼 딱 맞음
+   치마 아래는 카드 바닥선에 맞춰 무대 뒤에 서 있는 것처럼 보이게 함 */
+.cheer-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 600 / 267;
+  margin-top: 16px;
+}
+.cheer-char {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: var(--ox) 100%;
+  transform: translateX(110%);
+}
+/* --ox: 캐릭터 발 위치 (흔들리는 중심) / --delay: 등장 순서 / --sway: 흔드는 방향 */
+.cheer-char--hachiware { --ox: 17%; --delay: .2s;  --sway: 1; }
+.cheer-char--chiikawa  { --ox: 52%; --delay: .38s; --sway: -1; }
+.cheer-char--usagi     { --ox: 84%; --delay: .56s; --sway: 1; }
+
+.cheer.is-open .cheer-char {
+  animation:
+    walk-in .95s cubic-bezier(.25, .8, .35, 1) var(--delay) both,
+    hula 1.5s ease-in-out calc(var(--delay) + .95s) infinite;
+}
+/* 오른쪽에서 통통 뛰면서 가운데로 */
+@keyframes walk-in {
+  0%   { transform: translateX(110%); }
+  15%  { transform: translateX(88%) translateY(-7%) rotate(-5deg); }
+  30%  { transform: translateX(67%); }
+  45%  { transform: translateX(47%) translateY(-7%) rotate(-5deg); }
+  60%  { transform: translateX(28%); }
+  75%  { transform: translateX(10%) translateY(-6%) rotate(-4deg); }
+  88%  { transform: translateX(-2%) rotate(2deg); }
+  100% { transform: none; }
+}
+/* 도착 후엔 훌라춤처럼 살랑살랑 */
+@keyframes hula {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: translateY(-2%) rotate(calc(-3.5deg * var(--sway))); }
+  75% { transform: translateY(-2%) rotate(calc(3.5deg * var(--sway))); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

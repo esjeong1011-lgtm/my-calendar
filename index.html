@@ -144,6 +144,24 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <!-- 응원 팝업: 목표 일정을 등록하면 귀요미들이 오른쪽에서 걸어 나옴 -->
+  <section class="cheer" id="cheer" role="dialog" aria-modal="true" aria-label="응원 메시지">
+    <div class="cheer-card">
+      <button class="cheer-close press" type="button" data-close aria-label="닫기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </button>
+      <span class="cheer-spark cheer-spark--1" aria-hidden="true">♡</span>
+      <span class="cheer-spark cheer-spark--2" aria-hidden="true">✦</span>
+      <span class="cheer-spark cheer-spark--3" aria-hidden="true">✦</span>
+      <p class="cheer-bubble" id="cheerText">할 수 있따!</p>
+      <div class="cheer-stage" aria-hidden="true">
+        <img class="cheer-char cheer-char--hachiware" src="icons/mascot/hachiware.png" alt="">
+        <img class="cheer-char cheer-char--chiikawa" src="icons/mascot/chiikawa.png" alt="">
+        <img class="cheer-char cheer-char--usagi" src="icons/mascot/usagi.png" alt="">
+      </div>
+    </div>
+  </section>
+
   <script src="js/app.js"></script>
 </body>
 </html>

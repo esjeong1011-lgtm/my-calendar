@@ -106,6 +106,7 @@ const el = {
   monthPick: $('#monthPick'),
   saving: $('#saving'),
   toast: $('#toast'),
+  cheer: $('#cheer'),
 };
 
 /* ===== 아이콘 ===== */
@@ -608,12 +609,16 @@ el.form.addEventListener('submit', async (e) => {
   if (!ok) return;
 
   // 저장 완료 → 메인 화면으로, 저장한 날짜에 아이콘이 올라옴
+  const isNewGoal = !editingId && data.category === 'goal';
   sheets.hide();
   const s = parseDateKey(data.start.slice(0, 10));
   goToMonth(monthIndex(s.getFullYear(), s.getMonth()));
   const cell = el.months.querySelector(`.month[data-month="${anchor}"] .day[data-date="${data.start.slice(0, 10)}"]`);
   cell?.classList.add('just-saved');
   toast(editingId ? '일정을 수정했어요.' : '일정을 저장했어요.');
+
+  // 목표를 새로 등록하면 입력 창이 다 내려간 뒤 귀요미들이 응원하러 등장
+  if (isNewGoal) setTimeout(() => sheets.show(el.cheer), 650);
 });
 
 el.deleteBtn.addEventListener('click', async () => {
